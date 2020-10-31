@@ -19,7 +19,7 @@ public final class ColorSplitMain {
 		String startImageFilename  = path + baseFilename + "-BG.png";
 		String targetImageFilename = path + baseFilename + "-PAO.png";
 
-		PAOConstants pao = PAOConstantsV2.instance();
+		PaoConstants pao = PaoConstantsV2.instance();
 
 		LinearFrameBufferImage startImage  = LinearFrameBufferImage.fromFile(startImageFilename);
 		LinearFrameBufferImage targetImage = LinearFrameBufferImage.fromFile(targetImageFilename);
@@ -64,14 +64,14 @@ public final class ColorSplitMain {
 		for (int i = 0; i < differenceArray.length; i++) {
 			boolean alreadyCorrectColor = startArray[i] == targetArray[i];
 			differenceArray[i] = alreadyCorrectColor ?
-			                     PAOUtilities.TRANSPARENT :
+			                     PaoUtilities.TRANSPARENT :
 			                     0xFF000000 | targetArray[i];
 		}
 
 		return differenceImage;
 	}
 
-	private static ColorTemplate[] splitColors(PAOConstants pao, LinearFrameBufferImage colorsImage) {
+	private static ColorTemplate[] splitColors(PaoConstants pao, LinearFrameBufferImage colorsImage) {
 		int numColors = pao.getNumColors();
 
 		LinearFrameBufferImage[] splitColorImages =
@@ -90,8 +90,8 @@ public final class ColorSplitMain {
 
 			int index = pao.getColorIndex(rgb);
 			if (index < 0)
-				throw new PAOColorException("Target image contains a color not in the PAO palette: " +
-				                            PAOUtilities.toHexColor(rgb));
+				throw new PaoColorException("Target image contains a color not in the PAO palette: " +
+				                            PaoUtilities.toHexColor(rgb));
 
 			dstArrays[index][i] = rgb;
 			counts[index]++;

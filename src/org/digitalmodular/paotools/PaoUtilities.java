@@ -4,8 +4,8 @@ package org.digitalmodular.paotools;
  * @author zom-b
  */
 // Created 2020-10-30
-public final class PAOUtilities {
-	private PAOUtilities() { throw new AssertionError(); }
+public final class PaoUtilities {
+	private PaoUtilities() { throw new AssertionError(); }
 
 	public static final int TRANSPARENT = 0x00000000;
 

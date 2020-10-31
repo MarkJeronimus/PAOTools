@@ -4,7 +4,7 @@ package org.digitalmodular.paotools;
  * @author zom-b
  */
 // Created 2020-10-30
-public interface PAOConstants {
+public interface PaoConstants {
 	int getNumColors();
 
 	int getColor(int index);
