@@ -1,4 +1,23 @@
-package org.digitalmodular.paotools;
+/*
+ * This file is part of PAO.
+ *
+ * Copyleft 2023 Mark Jeronimus. All Rights Reversed.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.digitalmodular.paotools.newpalettizer;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -20,17 +39,24 @@ import javax.imageio.ImageIO;
  * <p>
  * There's a static convenience method to create an instance of any other image.
  *
- * @author zom-b
+ * @author Mark Jeronimus
+ * @deprecated not JS compatible
  */
 // Created 2020-10-30
+@Deprecated
 public class LinearFrameBufferImage extends BufferedImage {
-	private final int[] array;
+	private final int[]  array;
+	public        Object extraData;
 
 	/**
 	 * Loads an image as if by calling {@link ImageIO#read(File)} and converts it to a {@code LinearFrameBufferImage}.
 	 */
 	public static LinearFrameBufferImage fromFile(String filename) throws IOException {
 		BufferedImage image = ImageIO.read(new File(filename));
+		if (image == null) {
+			throw new IOException("Unsupported image format");
+		}
+
 		return fromImage(image);
 	}
 
@@ -110,7 +136,7 @@ public class LinearFrameBufferImage extends BufferedImage {
 		array = ((DataBufferInt)getRaster().getDataBuffer()).getData();
 	}
 
-	private boolean isTransparent() {
+	public boolean isTransparent() {
 		return getType() == TYPE_INT_ARGB;
 	}
 
@@ -130,8 +156,9 @@ public class LinearFrameBufferImage extends BufferedImage {
 	}
 
 	private static int validateType(int imageType) {
-		if (!(imageType == TYPE_INT_RGB || imageType == TYPE_INT_ARGB))
+		if (!(imageType == TYPE_INT_RGB || imageType == TYPE_INT_ARGB)) {
 			throw new IllegalArgumentException("'imageType' must be either TYPE_INT_RGB or TYPE_INT_ARGB");
+		}
 
 		return imageType;
 	}
@@ -158,12 +185,12 @@ public class LinearFrameBufferImage extends BufferedImage {
 //				case TYPE_INT_BGR:
 //					drawIntArrayImage(target, (DataBufferInt)dataBuffer);
 //					return;
-//				case TYPE_3BYTE_BGR:
-//					drawBGRArrayImage(target, (DataBufferByte)dataBuffer);
-//					return;
-//				case TYPE_4BYTE_ABGR:
-//					drawABGRArrayImage(target, (DataBufferByte)dataBuffer);
-//					return;
+				case TYPE_3BYTE_BGR:
+					draw3ByteBGRImage(target, (DataBufferByte)dataBuffer);
+					return;
+				case TYPE_4BYTE_ABGR:
+					draw4ByteABGRImage(target, (DataBufferByte)dataBuffer);
+					return;
 				case TYPE_BYTE_GRAY:
 					drawByteGrayImage(target, (DataBufferByte)dataBuffer);
 					return;
@@ -196,8 +223,9 @@ public class LinearFrameBufferImage extends BufferedImage {
 		if (!target.isTransparent()) {
 			System.arraycopy(srcArray, 0, dstArray, 0, srcArray.length);
 		} else {
-			for (int i = 0; i < dstArray.length; i++)
+			for (int i = 0; i < dstArray.length; i++) {
 				dstArray[i] = 0xFF000000 | srcArray[i];
+			}
 		}
 	}
 
@@ -210,38 +238,38 @@ public class LinearFrameBufferImage extends BufferedImage {
 		System.arraycopy(srcArray, 0, dstArray, 0, srcArray.length);
 	}
 
-//	@SuppressWarnings("ValueOfIncrementOrDecrementUsed")
-//	private static void drawBGRArrayImage(LinearFrameBuffer target, DataBufferByte dataBuffer) {
-//		byte[] srcArray    = dataBuffer.getData();
-//		int[]  dstArray = target.getArray();
-//
-//		assert srcArray.length == 3 * dstArray.length : srcArray.length + " != 3 * " + dstArray.length;
-//
-//		int j = 0;
-//		for (int i = 0; i < dstArray.length; i++) {
-//			int b = srcArray[j++] & 0xFF;
-//			int g = srcArray[j++] & 0xFF;
-//			int r = srcArray[j++] & 0xFF;
-//			dstArray[i] = 0xFF000000 | r << 16 | g << 8 | b;
-//		}
-//	}
-//
-//	@SuppressWarnings("ValueOfIncrementOrDecrementUsed")
-//	private static void drawABGRArrayImage(LinearFrameBuffer target, DataBufferByte dataBuffer) {
-//		byte[] srcArray    = dataBuffer.getData();
-//		int[]  dstArray = target.getArray();
-//
-//		assert srcArray.length == 4 * dstArray.length : srcArray.length + " != 4 * " + dstArray.length;
-//
-//		int j = 0;
-//		for (int i = 0; i < dstArray.length; i++) {
-//			int a = srcArray[j++] & 0xFF;
-//			int b = srcArray[j++] & 0xFF;
-//			int g = srcArray[j++] & 0xFF;
-//			int r = srcArray[j++] & 0xFF;
-//			dstArray[i] = a << 24 | r << 16 | g << 8 | b;
-//		}
-//	}
+	@SuppressWarnings("ValueOfIncrementOrDecrementUsed")
+	private static void draw3ByteBGRImage(LinearFrameBufferImage target, DataBufferByte dataBuffer) {
+		byte[] srcArray = dataBuffer.getData();
+		int[]  dstArray = target.getArray();
+
+		assert srcArray.length == 3 * dstArray.length : srcArray.length + " != 3 * " + dstArray.length;
+
+		int j = 0;
+		for (int i = 0; i < dstArray.length; i++) {
+			int b = srcArray[j++] & 0xFF;
+			int g = srcArray[j++] & 0xFF;
+			int r = srcArray[j++] & 0xFF;
+			dstArray[i] = 0xFF000000 | r << 16 | g << 8 | b;
+		}
+	}
+
+	@SuppressWarnings("ValueOfIncrementOrDecrementUsed")
+	private static void draw4ByteABGRImage(LinearFrameBufferImage target, DataBufferByte dataBuffer) {
+		byte[] srcArray = dataBuffer.getData();
+		int[]  dstArray = target.getArray();
+
+		assert srcArray.length == 4 * dstArray.length : srcArray.length + " != 4 * " + dstArray.length;
+
+		int j = 0;
+		for (int i = 0; i < dstArray.length; i++) {
+			int a = srcArray[j++] & 0xFF;
+			int b = srcArray[j++] & 0xFF;
+			int g = srcArray[j++] & 0xFF;
+			int r = srcArray[j++] & 0xFF;
+			dstArray[i] = a << 24 | r << 16 | g << 8 | b;
+		}
+	}
 
 	@SuppressWarnings("ValueOfIncrementOrDecrementUsed")
 	private static void drawByteGrayImage(LinearFrameBufferImage target, DataBufferByte dataBuffer) {
@@ -268,7 +296,8 @@ public class LinearFrameBufferImage extends BufferedImage {
 		int[] colors    = new int[numColors];
 		colorModel.getRGBs(colors);
 
-		for (int i = 0; i < dstArray.length; i++)
+		for (int i = 0; i < dstArray.length; i++) {
 			dstArray[i] = colors[Math.min(srcArray[i] & 0xFF, numColors)];
+		}
 	}
 }

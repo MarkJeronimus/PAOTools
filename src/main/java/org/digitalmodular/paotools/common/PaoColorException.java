@@ -1,7 +1,7 @@
-package org.digitalmodular.paotools;
+package org.digitalmodular.paotools.common;
 
 /**
- * @author zom-b
+ * @author Mark Jeronimus
  */
 // Created 2020-10-30
 public class PaoColorException extends RuntimeException {
