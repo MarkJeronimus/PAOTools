@@ -1,14 +1,15 @@
 package org.digitalmodular.paotools.templater;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
 
@@ -35,13 +36,18 @@ public final class ColorSplitterMain {
 	public static void main(String... args) throws Exception {
 		String path = "/home/zom-b/Pictures/Pixelart/PR/";
 
-		String baseFilename = "HE1_0945-brown";
+		String baseFilename = "TML-01";
+		int    offsetX      = 5420;
+		int    offsetY      = 3360;
 
-		LinearFrameBufferImage targetImage = LinearFrameBufferImage.fromFile(path + baseFilename + "-PAO.png");
+		LinearFrameBufferImage targetImage = LinearFrameBufferImage.fromFile(path + baseFilename + "-PR.png");
 		LinearFrameBufferImage startImage;
 
 		try {
-			startImage = LinearFrameBufferImage.fromFile(path + baseFilename + "-BG.png");
+//			BufferedImage image = ImageIO.read(new File(path + baseFilename + "-BG.png"));
+			BufferedImage image = downloadBGImage(offsetX, offsetY, targetImage);
+
+			startImage = LinearFrameBufferImage.fromImage(image);
 			checkImageCompatibility(startImage, targetImage);
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -72,6 +78,25 @@ public final class ColorSplitterMain {
 
 //		saveTemplates(palette, path, baseFilename, processedTemplates);
 		saveTemplate(palette, path, baseFilename, processedTemplates, 0);
+	}
+
+	private static BufferedImage downloadBGImage(int offsetX, int offsetY, BufferedImage targetImage)
+			throws IOException {
+		URL           bdURL  = new URL("https://www.pixelroyale.net/1.png");
+		BufferedImage canvas = ImageIO.read(bdURL);
+
+		BufferedImage image = new BufferedImage(targetImage.getWidth(),
+		                                        targetImage.getHeight(),
+		                                        BufferedImage.TYPE_INT_RGB);
+
+		Graphics2D g = image.createGraphics();
+		try {
+			g.drawImage(canvas, -offsetX, -offsetY, null);
+		} finally {
+			g.dispose();
+		}
+
+		return image;
 	}
 
 	public static void checkImageCompatibility(BufferedImage startImage, BufferedImage targetImage) {
@@ -129,7 +154,7 @@ public final class ColorSplitterMain {
 			int index = pao.getIndexOfColor(rgb);
 			if (index < 0) {
 				throw new PaoColorException(
-						String.format("Target image contains a color not in the PAO palette: #%06X", rgb));
+						String.format("Target image contains a color not in the PR palette: #%06X", rgb));
 			}
 
 			dstArrays[index][i] = rgb;
