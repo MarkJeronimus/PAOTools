@@ -59,7 +59,7 @@ public final class ColorSplitterMain {
 //		TemplateProcessor templateProcessor  = new StackTemplateProcessor(PaoUtilities.WHITE);
 //		TemplateProcessor templateProcessor = new AnnihilatingTemplateProcessor();
 		ColorTemplate[] processedTemplates =
-				templateProcessor.process(palette, startImage, targetImage, sortedTemplates);
+				templateProcessor.process(startImage, targetImage, sortedTemplates);
 
 		saveTemplates(palette, path, baseFilename, processedTemplates);
 	}

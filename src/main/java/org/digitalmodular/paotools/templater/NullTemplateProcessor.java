@@ -1,6 +1,5 @@
 package org.digitalmodular.paotools.templater;
 
-import org.digitalmodular.paotools.newpalettizer.palette.Palette;
 import org.digitalmodular.paotools.newpalettizer.LinearFrameBufferImage;
 
 /**
@@ -13,8 +12,7 @@ import org.digitalmodular.paotools.newpalettizer.LinearFrameBufferImage;
 // Created 2020-11-02
 public class NullTemplateProcessor implements TemplateProcessor {
 	@Override
-	public ColorTemplate[] process(Palette pao,
-	                               LinearFrameBufferImage startImage,
+	public ColorTemplate[] process(LinearFrameBufferImage startImage,
 	                               LinearFrameBufferImage targetImage,
 	                               ColorTemplate[] templates) {
 		return templates;

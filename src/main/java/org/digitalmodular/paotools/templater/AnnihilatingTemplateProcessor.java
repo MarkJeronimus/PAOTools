@@ -1,7 +1,6 @@
 package org.digitalmodular.paotools.templater;
 
 import org.digitalmodular.paotools.common.ColorUtilities;
-import org.digitalmodular.paotools.newpalettizer.palette.Palette;
 import org.digitalmodular.paotools.common.PaoUtilities;
 import org.digitalmodular.paotools.newpalettizer.LinearFrameBufferImage;
 
@@ -22,8 +21,7 @@ import org.digitalmodular.paotools.newpalettizer.LinearFrameBufferImage;
 // Created 2020-11-02
 public class AnnihilatingTemplateProcessor implements TemplateProcessor {
 	@Override
-	public ColorTemplate[] process(Palette pao,
-	                               LinearFrameBufferImage startImage,
+	public ColorTemplate[] process(LinearFrameBufferImage startImage,
 	                               LinearFrameBufferImage targetImage,
 	                               ColorTemplate[] templates) {
 		LinearFrameBufferImage simulatedDrawing   = LinearFrameBufferImage.fromImage(startImage);
@@ -51,7 +49,6 @@ public class AnnihilatingTemplateProcessor implements TemplateProcessor {
 				LinearFrameBufferImage.makeCompatibleImage(image, targetImage.isTransparent());
 
 		int[] src = image.getArray();
-		int[] tar = targetImage.getArray();
 		int[] dst = annihilatingImage.getArray();
 
 		for (int i = 0; i < dst.length; i++)
