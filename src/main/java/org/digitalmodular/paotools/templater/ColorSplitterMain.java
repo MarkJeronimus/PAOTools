@@ -55,6 +55,8 @@ public final class ColorSplitterMain {
 //		Collections.reverse(Arrays.asList(rawTemplates));
 //		ColorTemplate[] sortedTemplates = rawTemplates;
 
+//		sortedTemplates = new FloodFriendlyMakingTemplateProcessor().process(null, null, sortedTemplates);
+
 		TemplateProcessor templateProcessor = new NullTemplateProcessor();
 //		TemplateProcessor templateProcessor  = new StackTemplateProcessor(PaoUtilities.WHITE);
 //		TemplateProcessor templateProcessor = new AnnihilatingTemplateProcessor();
