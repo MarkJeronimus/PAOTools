@@ -93,8 +93,8 @@ public class WorldMapBorderMakerMain extends JPanel implements MouseMotionListen
 //	private static final double LINE_WIDTH         = 0.5;
 
 //	private static final String shorelinesFilename = "/home/zom-b/Downloads/gshhg-bin-2.3.7/gshhs_i.b";
-//	private static final String bordersFilename = "/home/zom-b/Downloads/gshhg-bin-2.3.7/wdb_borders_i.b";
-//	private static final String riversFilename  = "/home/zom-b/Downloads/gshhg-bin-2.3.7/wdb_rivers_i.b";
+//	private static final String bordersFilename    = "/home/zom-b/Downloads/gshhg-bin-2.3.7/wdb_borders_i.b";
+//	private static final String riversFilename     = "/home/zom-b/Downloads/gshhg-bin-2.3.7/wdb_rivers_i.b";
 //	private static final double LINE_WIDTH      = 1.2;
 
 	private static final String shorelinesFilename = "/home/zom-b/Downloads/gshhg-bin-2.3.7/gshhs_h.b";
@@ -126,7 +126,7 @@ public class WorldMapBorderMakerMain extends JPanel implements MouseMotionListen
 		System.out.println("Rivers: " + rivers.size());
 
 		saveSVG(shorelines, borders, rivers);
-		showGUI(shorelines, borders, rivers);
+//		showGUI(shorelines, borders, rivers);
 	}
 
 	private static List<Polygon> transformPolygons(Collection<Polygon> polygons) {
@@ -315,7 +315,7 @@ public class WorldMapBorderMakerMain extends JPanel implements MouseMotionListen
 		SVGPath internationalBorders = new SVGPath(384462);
 		internationalBorders.getAttributes().setID("National boundaries");
 		internationalBorders.getAttributes().setFill(SVGNoFill.INSTANCE);
-		internationalBorders.getAttributes().setStroke(Color.RED);
+		internationalBorders.getAttributes().setStroke(Color.BLACK);
 		internationalBorders.getAttributes().setStrokeWidth(LINE_WIDTH);
 		internationalBorders.getAttributes().setLineCap(SVGLineCap.ROUND);
 		internationalBorders.getAttributes().setLineJoin(SVGLineJoin.ROUND);
@@ -496,7 +496,7 @@ public class WorldMapBorderMakerMain extends JPanel implements MouseMotionListen
 
 			SVGPath path = (SVGPath)shorelinesLayer.get(level - 1);
 
-			addPolygonToPSVGPath(shoreline, path);
+			addPolygonToSVGPath(shoreline, path);
 		}
 
 		for (Polygon border : borders) {
@@ -504,7 +504,7 @@ public class WorldMapBorderMakerMain extends JPanel implements MouseMotionListen
 
 			SVGPath path = (SVGPath)bordersLayer.get(level - 1);
 
-			addPolygonToPSVGPath(border, path);
+			addPolygonToSVGPath(border, path);
 		}
 
 		for (Polygon river : rivers) {
@@ -512,7 +512,7 @@ public class WorldMapBorderMakerMain extends JPanel implements MouseMotionListen
 
 			SVGPath path = (SVGPath)riversLayer.get(level);
 
-			addPolygonToPSVGPath(river, path);
+			addPolygonToSVGPath(river, path);
 		}
 
 //		System.out.println("land                  size (initial capacity): " + land.size());
@@ -545,7 +545,7 @@ public class WorldMapBorderMakerMain extends JPanel implements MouseMotionListen
 		}
 	}
 
-	private static void addPolygonToPSVGPath(Polygon shoreline, SVGPath path) {
+	private static void addPolygonToSVGPath(Polygon shoreline, SVGPath path) {
 		List<Point2D> points = shoreline.getPoints();
 
 		int numPoints = points.size();
@@ -555,16 +555,31 @@ public class WorldMapBorderMakerMain extends JPanel implements MouseMotionListen
 			numPoints--;
 		}
 
+		float lastX = 0.0f;
+		float lastY = 0.0f;
+		int   n     = 1;
+		float thr   = (float)Math.pow(0.5, 2);
+
 		for (int i = 0; i < numPoints; i++) {
 			Point2D point = points.get(i);
 			if (i == 0) {
-				path.moveTo((float)point.getX(), (float)point.getY());
+				lastX = (float)point.getX();
+				lastY = (float)point.getY();
+				path.moveTo(lastX, lastY);
 			} else {
-				path.lineTo((float)point.getX(), (float)point.getY());
+				float dx   = lastX - (float)point.getX();
+				float dy   = lastY - (float)point.getY();
+				float dist = dx * dx + dy * dy;
+				if (dist > thr || i == numPoints - 1) {
+					lastX = (float)point.getX();
+					lastY = (float)point.getY();
+					path.lineTo(lastX, lastY);
+					n++;
+				}
 			}
 		}
 
-		if (closedLoop) {
+		if (closedLoop && n > 2) {
 			path.closePath();
 		}
 	}
