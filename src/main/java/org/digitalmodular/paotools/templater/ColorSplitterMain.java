@@ -117,12 +117,14 @@ public final class ColorSplitterMain {
 		int[] differenceArray = differenceImage.getArray();
 
 		for (int i = 0; i < differenceArray.length; i++) {
+			int startPixel = startArray[i] & 0xFFFFFF;
 			if (ColorUtilities.isTransparent(targetArray[i])) {
-				differenceArray[i] = startArray[i] == 0xFFFFFFFF ? PaoUtilities.TRANSPARENT : PaoUtilities.WHITE;
+				differenceArray[i] = startPixel == 0xFFFFFF ? PaoUtilities.TRANSPARENT : PaoUtilities.WHITE;
 			} else {
-				differenceArray[i] = startArray[i] == targetArray[i] ?
+				int targetPixel = targetArray[i] & 0xFFFFFF;
+				differenceArray[i] = startPixel == targetPixel ?
 				                     PaoUtilities.TRANSPARENT :
-				                     PaoUtilities.BLACK | targetArray[i];
+				                     PaoUtilities.BLACK | targetPixel;
 			}
 		}
 
