@@ -60,7 +60,7 @@ public final class ColorSplitterMain {
 		ColorTemplate[]        rawTemplates    = splitColors(palette, differenceImage);
 
 //		TemplateSorter sorter = new PerceptualLuminositySorter();
-		TemplateSorter sorter = new PixelCountSorter(false);
+		TemplateSorter sorter = new PixelCountSorter(true);
 
 		ColorTemplate[] sortedTemplates = sorter.sortTemplates(palette, rawTemplates);
 //		Collections.reverse(Arrays.asList(rawTemplates));
@@ -68,9 +68,10 @@ public final class ColorSplitterMain {
 
 //		sortedTemplates = new FloodFriendlyMakingTemplateProcessor().process(null, null, sortedTemplates);
 
-		TemplateProcessor templateProcessor = new NullTemplateProcessor();
-//		TemplateProcessor templateProcessor  = new StackTemplateProcessor(PaoUtilities.WHITE);
-//		TemplateProcessor templateProcessor = new AnnihilatingTemplateProcessor();
+//		TemplateProcessor templateProcessor = new NullTemplateProcessor();
+//		TemplateProcessor templateProcessor = new StackTemplateProcessor(PaoUtilities.WHITE);
+		TemplateProcessor templateProcessor = new AnnihilatingTemplateProcessor();
+
 		ColorTemplate[] processedTemplates =
 				templateProcessor.process(startImage, targetImage, sortedTemplates);
 
