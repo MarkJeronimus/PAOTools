@@ -3,7 +3,12 @@ package org.digitalmodular.paotools.templater;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
 
@@ -49,7 +54,7 @@ public final class ColorSplitterMain {
 		ColorTemplate[]        rawTemplates    = splitColors(palette, differenceImage);
 
 //		TemplateSorter sorter = new PerceptualLuminositySorter();
-		TemplateSorter  sorter          = new PixelCountSorter(false);
+		TemplateSorter sorter = new PixelCountSorter(false);
 
 		ColorTemplate[] sortedTemplates = sorter.sortTemplates(palette, rawTemplates);
 //		Collections.reverse(Arrays.asList(rawTemplates));
@@ -62,6 +67,8 @@ public final class ColorSplitterMain {
 //		TemplateProcessor templateProcessor = new AnnihilatingTemplateProcessor();
 		ColorTemplate[] processedTemplates =
 				templateProcessor.process(startImage, targetImage, sortedTemplates);
+
+		deleteOldTemplates(path, baseFilename);
 
 //		saveTemplates(palette, path, baseFilename, processedTemplates);
 		saveTemplate(palette, path, baseFilename, processedTemplates, 0);
@@ -181,6 +188,19 @@ public final class ColorSplitterMain {
 			System.out.println();
 
 			ImageIO.write(image, "PNG", new File(filename));
+		}
+	}
+
+	private static void deleteOldTemplates(String path, String baseFilename) throws IOException {
+		String     prefix = baseFilename + "-PR-";
+		Path       dir    = Paths.get(path);
+		List<Path> files  = Files.list(dir).toList();
+		for (Path file : files) {
+			String filename = file.getFileName().toString();
+
+			if (filename.startsWith(prefix) && filename.endsWith(".png")) {
+				Files.delete(file);
+			}
 		}
 	}
 }
