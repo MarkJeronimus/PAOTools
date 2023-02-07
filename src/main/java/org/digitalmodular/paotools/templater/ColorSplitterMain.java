@@ -76,8 +76,8 @@ public final class ColorSplitterMain {
 
 		deleteOldTemplates(path, baseFilename);
 
-//		saveTemplates(palette, path, baseFilename, processedTemplates);
-		saveTemplate(palette, path, baseFilename, processedTemplates, 0);
+		saveTemplates(palette, path, baseFilename, processedTemplates, offsetX, offsetY);
+//		saveTemplate(palette, path, baseFilename, processedTemplates, 0, offsetX, offsetY);
 	}
 
 	private static BufferedImage downloadBGImage(int offsetX, int offsetY, BufferedImage targetImage)
@@ -177,10 +177,12 @@ public final class ColorSplitterMain {
 	public static void saveTemplates(Palette palette,
 	                                 String path,
 	                                 String baseFilename,
-	                                 ColorTemplate[] templates)
+	                                 ColorTemplate[] templates,
+	                                 int offsetX,
+	                                 int offsetY)
 			throws IOException {
 		for (int i = 0; i < templates.length; i++) {
-			saveTemplate(palette, path, baseFilename, templates, i);
+			saveTemplate(palette, path, baseFilename, templates, i, offsetX, offsetY);
 		}
 	}
 
@@ -188,7 +190,9 @@ public final class ColorSplitterMain {
 	                                 String path,
 	                                 String baseFilename,
 	                                 ColorTemplate[] templates,
-	                                 int index)
+	                                 int index,
+	                                 int offsetX,
+	                                 int offsetY)
 			throws IOException {
 		ColorTemplate template = templates[index];
 
@@ -206,9 +210,9 @@ public final class ColorSplitterMain {
 			System.out.print(filename);
 			System.out.print('\t');
 			for (int j = 1; j <= coordsToPrint[0]; j++) {
-				System.out.printf("|%.3f,%.3f",
-				                  (coordsToPrint[j] % image.getWidth()) / (float)image.getWidth(),
-				                  (coordsToPrint[j] / image.getWidth()) / (float)image.getHeight());
+				System.out.printf("|%d,%d",
+				                  coordsToPrint[j] % image.getWidth() + offsetX,
+				                  coordsToPrint[j] / image.getWidth() + offsetY);
 			}
 			System.out.println();
 
