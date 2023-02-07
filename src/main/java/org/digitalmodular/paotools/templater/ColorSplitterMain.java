@@ -63,7 +63,8 @@ public final class ColorSplitterMain {
 		ColorTemplate[] processedTemplates =
 				templateProcessor.process(startImage, targetImage, sortedTemplates);
 
-		saveTemplates(palette, path, baseFilename, processedTemplates);
+//		saveTemplates(palette, path, baseFilename, processedTemplates);
+		saveTemplate(palette, path, baseFilename, processedTemplates, 0);
 	}
 
 	public static void checkImageCompatibility(BufferedImage startImage, BufferedImage targetImage) {
@@ -144,32 +145,42 @@ public final class ColorSplitterMain {
 	public static void saveTemplates(Palette palette,
 	                                 String path,
 	                                 String baseFilename,
-	                                 ColorTemplate[] templates) throws IOException {
+	                                 ColorTemplate[] templates)
+			throws IOException {
 		for (int i = 0; i < templates.length; i++) {
-			ColorTemplate template = templates[i];
+			saveTemplate(palette, path, baseFilename, templates, i);
+		}
+	}
 
-			int count = template.getCount();
+	private static void saveTemplate(Palette palette,
+	                                 String path,
+	                                 String baseFilename,
+	                                 ColorTemplate[] templates,
+	                                 int index)
+			throws IOException {
+		ColorTemplate template = templates[index];
 
-			int                    colorIndex = template.getColorIndex();
-			LinearFrameBufferImage image      = template.getImage();
+		int count = template.getCount();
 
-			String colorName = palette.get(colorIndex).getName();
-			String filename = String.format("%s%s-PAO-%02d %s (col %d, N=%d).png",
-			                                path, baseFilename, i, colorName, colorIndex, count);
+		int                    colorIndex = template.getColorIndex();
+		LinearFrameBufferImage image      = template.getImage();
 
-			if (count > 0) {
-				int[] coordsToPrint = (int[])image.extraData;
-				System.out.print(filename);
-				System.out.print('\t');
-				for (int j = 1; j <= coordsToPrint[0]; j++) {
-					System.out.printf("|%.3f,%.3f",
-					                  (coordsToPrint[j] % image.getWidth()) / (float)image.getWidth(),
-					                  (coordsToPrint[j] / image.getWidth()) / (float)image.getHeight());
-				}
-				System.out.println();
+		String colorName = palette.get(colorIndex).getName();
+		String filename = String.format("%s%s-PR-%02d %s (%d).png",
+		                                path, baseFilename, index, colorName, count);
 
-				ImageIO.write(image, "PNG", new File(filename));
+		if (count > 0) {
+			int[] coordsToPrint = (int[])image.extraData;
+			System.out.print(filename);
+			System.out.print('\t');
+			for (int j = 1; j <= coordsToPrint[0]; j++) {
+				System.out.printf("|%.3f,%.3f",
+				                  (coordsToPrint[j] % image.getWidth()) / (float)image.getWidth(),
+				                  (coordsToPrint[j] / image.getWidth()) / (float)image.getHeight());
 			}
+			System.out.println();
+
+			ImageIO.write(image, "PNG", new File(filename));
 		}
 	}
 }
